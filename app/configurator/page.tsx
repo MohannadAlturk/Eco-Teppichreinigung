@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -12,6 +13,20 @@ import { calculatePrice } from '@/utils/priceCalculator';
 import { formatPrice } from '@/utils/format';
 import { useCartStore } from '@/store/cartStore';
 import { ChevronLeft, ChevronRight, Upload } from 'lucide-react';
+import { CarpetDimensionsDisplay } from '@/components/configurator/CarpetDimensionsDisplay';
+
+// Dynamisch laden für bessere Performance (nur Client-Side)
+const Carpet3DViewer = dynamic(
+  () => import('@/components/configurator/Carpet3DViewer').then((mod) => mod.Carpet3DViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[400px] bg-gray-100 rounded-2xl flex items-center justify-center">
+        <p className="text-gray-500">3D-Modell wird geladen...</p>
+      </div>
+    )
+  }
+);
 
 export default function ConfiguratorPage() {
   const router = useRouter();
@@ -148,13 +163,6 @@ export default function ConfiguratorPage() {
                 min="1"
                 required
               />
-              {config.length && config.width && config.length > 0 && config.width > 0 && (
-                <div className="p-4 bg-primary-50 rounded-xl">
-                  <p className="text-sm text-gray-700">
-                    Fläche: <strong>{((config.length * config.width) / 10000).toFixed(2)} m²</strong>
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         );
@@ -272,9 +280,12 @@ export default function ConfiguratorPage() {
     }
   };
 
+  // Zeige 3D-Modell ab Schritt 2 (wenn Typ ausgewählt wurde)
+  const show3DModel = config.type && currentStep >= 2;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
@@ -295,43 +306,116 @@ export default function ConfiguratorPage() {
           </div>
         </div>
 
-        {/* Step Content */}
-        <Card>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Step Content */}
+          <div>
+            <Card>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {renderStep()}
+                </motion.div>
+              </AnimatePresence>
 
-          {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 1}
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Zurück
-            </Button>
+              {/* Navigation */}
+              <div className="flex justify-between mt-8 pt-6 border-t">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  disabled={currentStep === 1}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Zurück
+                </Button>
 
-            {currentStep < totalSteps ? (
-              <Button onClick={handleNext} disabled={!canProceed()}>
-                Weiter
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
+                {currentStep < totalSteps ? (
+                  <Button onClick={handleNext} disabled={!canProceed()}>
+                    Weiter
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleAddToCart}>
+                    In den Warenkorb
+                  </Button>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* 3D Viewer Sidebar */}
+          <div className="lg:sticky lg:top-24 h-fit">
+            {show3DModel ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Card className="p-0 overflow-hidden">
+                  <div className="p-4 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl">
+                    <h3 className="text-white font-bold text-lg">
+                      3D Vorschau
+                    </h3>
+                    <p className="text-primary-100 text-sm">
+                      Live-Ansicht Ihres Teppichs
+                    </p>
+                  </div>
+                  <div className="relative h-[400px]">
+                    <Suspense fallback={
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <p className="text-gray-500">Lädt...</p>
+                      </div>
+                    }>
+                      <Carpet3DViewer
+                        length={config.length || 200}
+                        width={config.width || 150}
+                        thickness={config.thickness || 2}
+                        type={config.type || 'orient'}
+                      />
+                    </Suspense>
+                  </div>
+                  <div className="p-4">
+                    <CarpetDimensionsDisplay
+                      length={config.length || 0}
+                      width={config.width || 0}
+                      thickness={config.thickness || 0}
+                      type={config.type}
+                    />
+                  </div>
+                </Card>
+              </motion.div>
             ) : (
-              <Button onClick={handleAddToCart}>
-                In den Warenkorb
-              </Button>
+              <Card className="p-8 text-center">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-10 h-10 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  3D-Vorschau
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Wählen Sie eine Teppichart aus, um die 3D-Vorschau zu sehen
+                </p>
+              </Card>
             )}
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

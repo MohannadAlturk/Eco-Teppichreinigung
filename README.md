@@ -11,19 +11,27 @@ Ein vollständig funktionsfähiger Frontend-Prototyp für eine umweltfreundliche
 - **Formulare:** React Hook Form + Zod
 - **Animationen:** Framer Motion
 - **Icons:** Lucide React
+- **3D-Rendering:** Three.js + React Three Fiber + Drei
 
 ## Features
 
 ### Vollständige User Journey
 
 1. **Landing Page** - Übersicht über Service und Vorteile
-2. **Konfigurator** - Multi-Step-Formular zur Teppichkonfiguration
+2. **Konfigurator mit 3D-Visualisierung** - Multi-Step-Formular zur Teppichkonfiguration
    - Teppichart auswählen
-   - Größe angeben
-   - Dicke eingeben
+   - **Live 3D-Modell** - Interaktives 3D-Modell des Teppichs
+   - Größe angeben (Live-Update im 3D-Modell)
+   - Dicke eingeben (Live-Update im 3D-Modell)
    - Zustand beschreiben
    - Fotos hochladen (UI-Simulation)
    - Preisberechnung
+   - **Interaktive 3D-Vorschau:**
+     - Drehen mit Maus/Touch
+     - Zoomen mit Scroll/Pinch
+     - Echtzeit-Updates bei Dimensionsänderungen
+     - Unterschiedliche Farben je Teppichart
+     - Gitter für Größenreferenz
 3. **Warenkorb** - Übersicht der konfigurierten Teppiche
 4. **Checkout** - Adresseingabe, Versandart, Zahlungsmethode
 5. **Success-Page** - Bestellbestätigung
@@ -62,7 +70,7 @@ npm start
   /login
   /register
   /forgot-password
-  /configurator
+  /configurator        # Mit 3D-Visualisierung
   /cart
   /checkout
   /success
@@ -75,6 +83,7 @@ npm start
 /components
   /ui                   # Wiederverwendbare UI-Komponenten
   /layout              # Layout-Komponenten (Header, Footer)
+  /configurator        # 3D-Teppich-Viewer & Dimensions-Display
   /dashboard           # Dashboard-spezifische Komponenten
 
 /data                   # Mock-Daten
