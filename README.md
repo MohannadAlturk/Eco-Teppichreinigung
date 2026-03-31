@@ -145,9 +145,6 @@ Sie können sich mit beliebigen Daten einloggen - die Authentifizierung ist simu
 - Safari (neueste Version)
 - Edge (neueste Version)
 
-## Entwickelt mit
-
-Dieses Projekt wurde gemäß der Spezifikation in `frontend_prototype.md` entwickelt.
 
 ## License
 
