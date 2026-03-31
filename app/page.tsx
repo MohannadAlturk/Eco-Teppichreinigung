@@ -57,8 +57,8 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Teppichreinigung
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 px-2">
+              Teppich<wbr />reinigung
               <span className="text-primary-600"> neu gedacht</span>
             </h1>
             <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
