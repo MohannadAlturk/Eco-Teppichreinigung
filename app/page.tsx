@@ -62,8 +62,7 @@ export default function HomePage() {
               <span className="text-primary-600"> neu gedacht</span>
             </h1>
             <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Professionelle, umweltfreundliche Teppichreinigung mit kostenlosem
-              Versand. Einfach, schnell und nachhaltig.
+              Ihr Experte, wenn es um die Sauberkeit Ihres Teppichs geht. Einfach und sauber.
             </p>
             <Link href="/configurator">
               <Button size="lg">Teppich reinigen lassen</Button>

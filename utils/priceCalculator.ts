@@ -3,7 +3,7 @@ import { CarpetConfig, CarpetType } from '@/types/carpet';
 const BASE_PRICES: Record<CarpetType, number> = {
   orient: 1.2,
   wool: 0.8,
-  silk: 1.5,
+  general: 1.0,
   synthetic: 0.5,
 };
 

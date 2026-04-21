@@ -16,8 +16,17 @@ export default function CartPage() {
   const carpetTypeLabels: Record<string, string> = {
     orient: 'Orientteppich',
     wool: 'Wollteppich',
-    silk: 'Seidenteppich',
+    general: 'Allgemein',
     synthetic: 'Synthetik',
+  };
+
+  const generalSubtypeLabels: Record<string, string> = {
+    polypropylene: 'Polypropylen (PP)',
+    polyester: 'Polyester (weich)',
+    nylon: 'Nylon (Polyamid)',
+    mixed: 'Mischfasern',
+    shaggy: 'Shaggy (Langfaser & flauschig)',
+    tufted: 'Tufted',
   };
 
   if (items.length === 0) {
@@ -56,6 +65,12 @@ export default function CartPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-2">
                         {carpetTypeLabels[item.config.type]}
+                        {item.config.type === 'general' && item.config.generalSubtype && (
+                          <span className="text-gray-600 font-normal text-base">
+                            {' '}
+                            - {generalSubtypeLabels[item.config.generalSubtype]}
+                          </span>
+                        )}
                       </h3>
                       <div className="space-y-1 text-sm text-gray-600">
                         <p>

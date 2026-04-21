@@ -36,7 +36,7 @@ export const Carpet3DModel: React.FC<Carpet3DModelProps> = ({
   const carpetColors: Record<CarpetType, string> = {
     orient: '#8B4513', // Braun
     wool: '#DEB887', // Beige
-    silk: '#DAA520', // Gold
+    general: '#A0826D', // Mittelbraun
     synthetic: '#696969', // Grau
   };
 

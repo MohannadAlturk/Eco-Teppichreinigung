@@ -41,8 +41,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const carpetTypeLabels: Record<string, string> = {
     orient: 'Orientteppich',
     wool: 'Wollteppich',
-    silk: 'Seidenteppich',
+    general: 'Allgemein',
     synthetic: 'Synthetik',
+  };
+
+  const generalSubtypeLabels: Record<string, string> = {
+    polypropylene: 'Polypropylen (PP)',
+    polyester: 'Polyester (weich)',
+    nylon: 'Nylon (Polyamid)',
+    mixed: 'Mischfasern',
+    shaggy: 'Shaggy (Langfaser & flauschig)',
+    tufted: 'Tufted',
   };
 
   const allStatuses: typeof order.status[] = [
@@ -142,7 +151,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-gray-50 rounded-xl">
               <p className="text-sm text-gray-600">Teppichart</p>
-              <p className="font-semibold">{carpetTypeLabels[order.carpet.type]}</p>
+              <p className="font-semibold">
+                {carpetTypeLabels[order.carpet.type]}
+                {order.carpet.type === 'general' && order.carpet.generalSubtype && (
+                  <span className="text-gray-600 font-normal">
+                    {' '}
+                    - {generalSubtypeLabels[order.carpet.generalSubtype]}
+                  </span>
+                )}
+              </p>
             </div>
             <div className="p-4 bg-gray-50 rounded-xl">
               <p className="text-sm text-gray-600">Größe</p>

@@ -8,7 +8,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { CarpetConfig, CarpetType } from '@/types/carpet';
+import { CarpetConfig, CarpetType, GeneralCarpetSubtype } from '@/types/carpet';
+import { Select } from '@/components/ui/Select';
 import { calculatePrice } from '@/utils/priceCalculator';
 import { formatPrice } from '@/utils/format';
 import { useCartStore } from '@/store/cartStore';
@@ -43,27 +44,40 @@ export default function ConfiguratorPage() {
 
   const totalSteps = 6;
 
-  const carpetTypes: { value: CarpetType; label: string; description: string }[] = [
+  const carpetTypes: { value: CarpetType; label: string; description: string; image: string }[] = [
     {
       value: 'orient',
       label: 'Orientteppich',
       description: 'Handgeknüpfte traditionelle Teppiche',
+      image: '/images/carpets/orient.png',
     },
     {
       value: 'wool',
       label: 'Wollteppich',
       description: 'Teppiche aus natürlicher Wolle',
+      image: '/images/carpets/wool.png',
     },
     {
-      value: 'silk',
-      label: 'Seidenteppich',
-      description: 'Hochwertige Seidenteppiche',
+      value: 'general',
+      label: 'Allgemein',
+      description: '',
+      image: '/images/carpets/general.png',
     },
     {
       value: 'synthetic',
       label: 'Synthetik',
       description: 'Maschinell hergestellte Teppiche',
+      image: '/images/carpets/synthetic.png',
     },
+  ];
+
+  const generalSubtypes: { value: GeneralCarpetSubtype; label: string }[] = [
+    { value: 'polypropylene', label: 'Polypropylen (PP)' },
+    { value: 'polyester', label: 'Polyester (weich)' },
+    { value: 'nylon', label: 'Nylon (Polyamid)' },
+    { value: 'mixed', label: 'Mischfasern' },
+    { value: 'shaggy', label: 'Shaggy (Langfaser & flauschig)' },
+    { value: 'tufted', label: 'Tufted' },
   ];
 
   const handleNext = () => {
@@ -93,6 +107,10 @@ export default function ConfiguratorPage() {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
+        // Wenn 'general' ausgewählt ist, muss auch ein Subtyp gewählt sein
+        if (config.type === 'general') {
+          return config.generalSubtype !== undefined;
+        }
         return config.type !== undefined;
       case 2:
         return config.length && config.width && config.length > 0 && config.width > 0;
@@ -120,18 +138,98 @@ export default function ConfiguratorPage() {
                   key={type.value}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setConfig({ ...config, type: type.value })}
-                  className={`p-6 border-2 rounded-2xl cursor-pointer transition-all ${
+                  onClick={() => {
+                    // Wenn ein anderer Typ ausgewählt wird, generalSubtype zurücksetzen
+                    if (type.value !== 'general') {
+                      setConfig({ ...config, type: type.value, generalSubtype: undefined });
+                    } else {
+                      setConfig({ ...config, type: type.value });
+                    }
+                  }}
+                  className={`relative p-6 border-2 rounded-2xl cursor-pointer transition-all overflow-hidden ${
                     config.type === type.value
-                      ? 'border-primary-600 bg-primary-50'
+                      ? 'border-primary-600 ring-4 ring-primary-100'
                       : 'border-gray-200 hover:border-primary-300'
                   }`}
+                  style={{
+                    minHeight: '180px',
+                  }}
                 >
-                  <h3 className="font-semibold text-lg mb-1">{type.label}</h3>
-                  <p className="text-sm text-gray-600">{type.description}</p>
+                  {/* Hintergrundbild mit Fade-Effekt */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center z-0"
+                    style={{
+                      backgroundImage: `url(${type.image})`,
+                      maskImage: 'radial-gradient(circle at center, black 30%, transparent 100%)',
+                      WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 100%)',
+                    }}
+                  />
+
+                  {/* Dunkles Overlay für bessere Lesbarkeit */}
+                  <div className="absolute inset-0 bg-black/40 z-10" />
+
+                  {/* Inhalt */}
+                  <div className="relative z-20">
+                    <h3 className="font-bold text-xl mb-2 text-white drop-shadow-lg">
+                      {type.label}
+                    </h3>
+                    <p className="text-sm text-white drop-shadow-md font-medium">
+                      {type.description}
+                    </p>
+                  </div>
+
+                  {/* Ausgewählt-Indikator */}
+                  {config.type === type.value && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 z-20 w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center"
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </motion.div>
+                  )}
                 </motion.div>
               ))}
             </div>
+
+            {/* Zusatzfeld für Allgemein-Auswahl */}
+            {config.type === 'general' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-6"
+              >
+                <Select
+                  label="Welche Art von Teppich haben Sie?"
+                  options={[
+                    { value: '', label: 'Bitte auswählen...' },
+                    ...generalSubtypes,
+                  ]}
+                  value={config.generalSubtype || ''}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      generalSubtype: e.target.value as GeneralCarpetSubtype,
+                    })
+                  }
+                  required
+                />
+              </motion.div>
+            )}
           </div>
         );
 
@@ -242,6 +340,12 @@ export default function ConfiguratorPage() {
                 <p className="text-sm text-gray-600">Teppichart</p>
                 <p className="font-semibold">
                   {carpetTypes.find((t) => t.value === config.type)?.label}
+                  {config.type === 'general' && config.generalSubtype && (
+                    <span className="text-gray-600 font-normal">
+                      {' '}
+                      - {generalSubtypes.find((s) => s.value === config.generalSubtype)?.label}
+                    </span>
+                  )}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
