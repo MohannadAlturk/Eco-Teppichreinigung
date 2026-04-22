@@ -19,6 +19,7 @@ export default function CheckoutPage() {
   const [shippingData, setShippingData] = useState({
     firstName: '',
     lastName: '',
+    email: '',
     street: '',
     city: '',
     zipCode: '',
@@ -99,6 +100,15 @@ export default function CheckoutPage() {
                       required
                     />
                   </div>
+                  <Input
+                    type="email"
+                    name="email"
+                    label="E-Mail-Adresse"
+                    value={shippingData.email}
+                    onChange={handleChange}
+                    placeholder="ihre.email@beispiel.de"
+                    required
+                  />
                   <Input
                     name="street"
                     label="Straße und Hausnummer"

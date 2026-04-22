@@ -1,3 +1,9 @@
+/**
+ * @deprecated Registrierungs-System wurde entfernt - keine Authentifizierung mehr erforderlich
+ * Diese Seite wird nicht mehr verwendet und sollte aus der Navigation entfernt werden.
+ * Kunden können direkt ohne Registrierung bestellen und werden über E-Mail identifiziert.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +13,7 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { useUserStore } from '@/store/userStore';
+import { useUserStore } from '@/store/userStore'; // deprecated
 
 export default function RegisterPage() {
   const router = useRouter();

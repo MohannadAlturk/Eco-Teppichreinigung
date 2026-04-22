@@ -1,3 +1,9 @@
+/**
+ * @deprecated Dashboard wurde entfernt - keine Benutzer-Authentifizierung mehr erforderlich
+ * Kunden bestellen direkt über den Checkout und werden per E-Mail kontaktiert.
+ * Bestellverfolgung erfolgt über E-Mail-Links statt über Dashboard-Login.
+ */
+
 'use client';
 
 import Link from 'next/link';

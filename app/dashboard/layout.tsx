@@ -1,6 +1,10 @@
+/**
+ * @deprecated Dashboard-Layout wurde entfernt - keine Benutzer-Authentifizierung mehr erforderlich
+ */
+
 'use client';
 
-import { DashboardNav } from '@/components/dashboard/DashboardNav';
+import { DashboardNav } from '@/components/dashboard/DashboardNav'; // deprecated
 
 export default function DashboardLayout({
   children,

@@ -2,13 +2,23 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
-import { useUserStore } from '@/store/userStore';
+// deprecated - Login/Auth System wurde entfernt
+// import { useUserStore } from '@/store/userStore';
 
 export const Header = () => {
   const items = useCartStore((state) => state.items);
-  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+  // deprecated - Login/Auth System wurde entfernt
+  // const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+
+  const handleServiceClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const serviceSection = document.getElementById('service');
+    if (serviceSection) {
+      serviceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <header className="bg-gray-900 shadow-md sticky top-0 z-50 relative overflow-hidden">
@@ -35,13 +45,15 @@ export const Header = () => {
             >
               Startseite
             </Link>
-            <Link
-              href="/#service"
-              className="text-white hover:text-primary-400 transition-colors"
+            <a
+              href="#service"
+              onClick={handleServiceClick}
+              className="text-white hover:text-primary-400 transition-colors cursor-pointer"
             >
               Service
-            </Link>
-            {isAuthenticated ? (
+            </a>
+            {/* deprecated - Login/Dashboard wurde entfernt */}
+            {/* {isAuthenticated ? (
               <Link
                 href="/dashboard"
                 className="text-white hover:text-primary-400 transition-colors"
@@ -55,7 +67,7 @@ export const Header = () => {
               >
                 Login
               </Link>
-            )}
+            )} */}
           </nav>
 
           <div className="flex items-center space-x-4">
