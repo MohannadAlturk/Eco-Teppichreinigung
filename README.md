@@ -1,6 +1,6 @@
-# Eco Teppichreinigung - Frontend Prototyp
+# Eco Teppichreinigung - Frontend
 
-Ein vollständig funktionsfähiger Frontend-Prototyp für eine umweltfreundliche Teppichreinigungs-Plattform.
+Eine vollständig funktionsfähige Frontend-Anwendung für eine umweltfreundliche Teppichreinigungs-Plattform.
 
 ## Technologie-Stack
 
@@ -41,11 +41,11 @@ Ein vollständig funktionsfähiger Frontend-Prototyp für eine umweltfreundliche
    - Profilverwaltung
    - Einstellungen
 
-### Authentifizierung (Mock)
+### Bestellprozess ohne Registrierung
 
-- Login
-- Registrierung
-- Passwort vergessen
+- Direkter Checkout ohne Login
+- Email-basierte Identifizierung
+- Streamlined User Experience
 
 ## Installation
 
@@ -67,61 +67,53 @@ npm start
 
 ```
 /app                    # Next.js App Router Pages
-  /login
-  /register
-  /forgot-password
-  /configurator        # Mit 3D-Visualisierung
-  /cart
-  /checkout
-  /success
-  /dashboard
-    /orders
-      /[id]
-    /profile
-    /settings
+  /configurator        # Multi-Step-Formular mit 3D-Visualisierung
+  /cart                # Warenkorb
+  /checkout            # Bestellabschluss mit Zahlungsoptionen
+  /success             # Bestellbestätigung
+  /login               # deprecated - Auth-System entfernt
+  /register            # deprecated - Auth-System entfernt
+  /dashboard           # deprecated - Auth-System entfernt
 
 /components
   /ui                   # Wiederverwendbare UI-Komponenten
-  /layout              # Layout-Komponenten (Header, Footer)
+  /layout              # Header, Footer
   /configurator        # 3D-Teppich-Viewer & Dimensions-Display
-  /dashboard           # Dashboard-spezifische Komponenten
-
-/data                   # Mock-Daten
-  mockUsers.ts
-  mockOrders.ts
-  mockCarpets.ts
 
 /store                  # Zustand State Management
   cartStore.ts
   orderStore.ts
-  userStore.ts
 
 /types                  # TypeScript Type Definitionen
-  user.ts
-  order.ts
   carpet.ts
+  order.ts
 
 /utils                  # Utility-Funktionen
-  priceCalculator.ts
+  priceCalculator.ts   # Preisberechnung basierend auf Preisliste
   format.ts
 
 /styles                 # Globale Styles
   globals.css
 ```
 
-## Mock-Daten
+## Zahlungsmethoden
 
-Die Anwendung arbeitet vollständig mit Mock-Daten. Es ist **kein Backend** erforderlich.
+Die Anwendung unterstützt folgende Zahlungsoptionen (Frontend-seitig):
 
-### Login
+- **Kreditkarte** (Visa, Mastercard)
+- **PayPal**
+- **Klarna** (Rechnung / Ratenkauf)
+- **Sofortüberweisung**
+- **Giropay**
+- **SEPA Lastschrift**
 
-Sie können sich mit beliebigen Daten einloggen - die Authentifizierung ist simuliert.
+Die Integration der Payment-Provider erfolgt später im Backend.
 
 ## Wichtige Hinweise
 
 - **Kein Backend:** Alle Daten werden nur im Browser gespeichert (Zustand)
 - **Keine Persistenz:** Bei Seiten-Reload gehen die Daten verloren
-- **Prototyp:** Für Demo- und Präsentationszwecke optimiert
+- **Production-Ready Frontend:** Bereit für Backend-Integration
 
 ## Design-Prinzipien
 
@@ -146,6 +138,26 @@ Sie können sich mit beliebigen Daten einloggen - die Authentifizierung ist simu
 - Edge (neueste Version)
 
 
+## Features Highlights
+
+### 3D-Teppich-Visualisierung
+- Interaktives 3D-Modell mit Three.js
+- Live-Updates bei Größen-/Dickenänderungen
+- Zoom, Rotation, Touch-Support
+- Unterschiedliche Farben je Teppichart
+
+### Preisberechnung
+- Automatische Berechnung basierend auf offizieller Preisliste
+- Live-Update im Preis-Kasten
+- Berücksichtigung von Teppichart, Größe und Dicke
+
+### User Experience
+- Smooth Scroll Navigation
+- Kein Login erforderlich
+- Email-basierte Bestellung
+- 6 verschiedene Zahlungsmethoden
+- Vollständig responsive Design
+
 ## License
 
-Dieses Projekt ist ein Prototyp zu Demonstrationszwecken.
+© 2026 Eco Teppichreinigung. Alle Rechte vorbehalten.

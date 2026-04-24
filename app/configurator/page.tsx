@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -15,19 +14,7 @@ import { formatPrice } from '@/utils/format';
 import { useCartStore } from '@/store/cartStore';
 import { ChevronLeft, ChevronRight, Upload } from 'lucide-react';
 import { CarpetDimensionsDisplay } from '@/components/configurator/CarpetDimensionsDisplay';
-
-// Dynamisch laden für bessere Performance (nur Client-Side)
-const Carpet3DViewer = dynamic(
-  () => import('@/components/configurator/Carpet3DViewer').then((mod) => mod.Carpet3DViewer),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[400px] bg-gray-100 rounded-2xl flex items-center justify-center">
-        <p className="text-gray-500">3D-Modell wird geladen...</p>
-      </div>
-    )
-  }
-);
+import { CarpetRoomPreview } from '@/components/configurator/CarpetRoomPreview';
 
 export default function ConfiguratorPage() {
   const router = useRouter();
@@ -675,27 +662,20 @@ export default function ConfiguratorPage() {
                 <Card className="p-0 overflow-hidden">
                   <div className="p-4 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl">
                     <h3 className="text-white font-bold text-lg">
-                      3D Vorschau
+                      Teppich-Vorschau
                     </h3>
                     <p className="text-primary-100 text-sm">
-                      Live-Ansicht Ihres Teppichs
+                      Größenvergleich mit einer Person (170 cm)
                     </p>
                   </div>
-                  <div className="relative h-[400px]">
-                    <Suspense fallback={
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <p className="text-gray-500">Lädt...</p>
-                      </div>
-                    }>
-                      <Carpet3DViewer
-                        length={config.length || 200}
-                        width={config.width || 150}
-                        thickness={config.thickness || 2}
-                        type={config.type || 'orient'}
-                      />
-                    </Suspense>
-                  </div>
                   <div className="p-4">
+                    <CarpetRoomPreview
+                      length={config.length || 200}
+                      width={config.width || 150}
+                      type={config.type || 'orient'}
+                    />
+                  </div>
+                  <div className="p-4 pt-0">
                     <CarpetDimensionsDisplay
                       length={config.length || 0}
                       width={config.width || 0}
@@ -723,10 +703,10 @@ export default function ConfiguratorPage() {
                   </svg>
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  3D-Vorschau
+                  Teppich-Vorschau
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Wählen Sie eine Teppichart aus, um die 3D-Vorschau zu sehen
+                  Wählen Sie eine Teppichart aus, um den Größenvergleich zu sehen
                 </p>
               </Card>
             )}

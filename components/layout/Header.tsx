@@ -12,6 +12,13 @@ export const Header = () => {
   // deprecated - Login/Auth System wurde entfernt
   // const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 
+  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleServiceClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const serviceSection = document.getElementById('service');
@@ -41,6 +48,7 @@ export const Header = () => {
           <nav className="hidden md:flex space-x-8">
             <Link
               href="/"
+              onClick={handleHomeClick}
               className="text-white hover:text-primary-400 transition-colors"
             >
               Startseite
