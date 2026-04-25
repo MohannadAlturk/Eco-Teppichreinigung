@@ -74,7 +74,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Eco Teppichreinigung. Alle Rechte vorbehalten.</p>
+          <p>&copy; {new Date().getFullYear()} Eco Teppichreinigung. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     </footer>

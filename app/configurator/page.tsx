@@ -1,32 +1,20 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { CarpetConfig, CarpetType } from '@/types/carpet';
+import { CarpetConfig, CarpetType, GeneralCarpetSubtype } from '@/types/carpet';
+import { Select } from '@/components/ui/Select';
 import { calculatePrice } from '@/utils/priceCalculator';
 import { formatPrice } from '@/utils/format';
 import { useCartStore } from '@/store/cartStore';
 import { ChevronLeft, ChevronRight, Upload } from 'lucide-react';
 import { CarpetDimensionsDisplay } from '@/components/configurator/CarpetDimensionsDisplay';
-
-// Dynamisch laden für bessere Performance (nur Client-Side)
-const Carpet3DViewer = dynamic(
-  () => import('@/components/configurator/Carpet3DViewer').then((mod) => mod.Carpet3DViewer),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[400px] bg-gray-100 rounded-2xl flex items-center justify-center">
-        <p className="text-gray-500">3D-Modell wird geladen...</p>
-      </div>
-    )
-  }
-);
+import { CarpetRoomPreview } from '@/components/configurator/CarpetRoomPreview';
 
 export default function ConfiguratorPage() {
   const router = useRouter();
@@ -43,27 +31,40 @@ export default function ConfiguratorPage() {
 
   const totalSteps = 6;
 
-  const carpetTypes: { value: CarpetType; label: string; description: string }[] = [
+  const carpetTypes: { value: CarpetType; label: string; description: string; image: string }[] = [
     {
       value: 'orient',
       label: 'Orientteppich',
       description: 'Handgeknüpfte traditionelle Teppiche',
+      image: '/images/carpets/orient.png',
     },
     {
       value: 'wool',
       label: 'Wollteppich',
       description: 'Teppiche aus natürlicher Wolle',
+      image: '/images/carpets/wool.png',
     },
     {
-      value: 'silk',
-      label: 'Seidenteppich',
-      description: 'Hochwertige Seidenteppiche',
+      value: 'general',
+      label: 'Allgemein',
+      description: '',
+      image: '/images/carpets/general.png',
     },
     {
       value: 'synthetic',
       label: 'Synthetik',
       description: 'Maschinell hergestellte Teppiche',
+      image: '/images/carpets/synthetic.png',
     },
+  ];
+
+  const generalSubtypes: { value: GeneralCarpetSubtype; label: string }[] = [
+    { value: 'polypropylene', label: 'Polypropylen (PP)' },
+    { value: 'polyester', label: 'Polyester (weich)' },
+    { value: 'nylon', label: 'Nylon (Polyamid)' },
+    { value: 'mixed', label: 'Mischfasern' },
+    { value: 'shaggy', label: 'Shaggy (Langfaser & flauschig)' },
+    { value: 'tufted', label: 'Tufted' },
   ];
 
   const handleNext = () => {
@@ -93,6 +94,10 @@ export default function ConfiguratorPage() {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
+        // Wenn 'general' ausgewählt ist, muss auch ein Subtyp gewählt sein
+        if (config.type === 'general') {
+          return config.generalSubtype !== undefined;
+        }
         return config.type !== undefined;
       case 2:
         return config.length && config.width && config.length > 0 && config.width > 0;
@@ -120,18 +125,98 @@ export default function ConfiguratorPage() {
                   key={type.value}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setConfig({ ...config, type: type.value })}
-                  className={`p-6 border-2 rounded-2xl cursor-pointer transition-all ${
+                  onClick={() => {
+                    // Wenn ein anderer Typ ausgewählt wird, generalSubtype zurücksetzen
+                    if (type.value !== 'general') {
+                      setConfig({ ...config, type: type.value, generalSubtype: undefined });
+                    } else {
+                      setConfig({ ...config, type: type.value });
+                    }
+                  }}
+                  className={`relative p-6 border-2 rounded-2xl cursor-pointer transition-all overflow-hidden ${
                     config.type === type.value
-                      ? 'border-primary-600 bg-primary-50'
+                      ? 'border-primary-600 ring-4 ring-primary-100'
                       : 'border-gray-200 hover:border-primary-300'
                   }`}
+                  style={{
+                    minHeight: '180px',
+                  }}
                 >
-                  <h3 className="font-semibold text-lg mb-1">{type.label}</h3>
-                  <p className="text-sm text-gray-600">{type.description}</p>
+                  {/* Hintergrundbild mit Fade-Effekt */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center z-0"
+                    style={{
+                      backgroundImage: `url(${type.image})`,
+                      maskImage: 'radial-gradient(circle at center, black 30%, transparent 100%)',
+                      WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 100%)',
+                    }}
+                  />
+
+                  {/* Dunkles Overlay für bessere Lesbarkeit */}
+                  <div className="absolute inset-0 bg-black/40 z-10" />
+
+                  {/* Inhalt */}
+                  <div className="relative z-20">
+                    <h3 className="font-bold text-xl mb-2 text-white drop-shadow-lg">
+                      {type.label}
+                    </h3>
+                    <p className="text-sm text-white drop-shadow-md font-medium">
+                      {type.description}
+                    </p>
+                  </div>
+
+                  {/* Ausgewählt-Indikator */}
+                  {config.type === type.value && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 z-20 w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center"
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </motion.div>
+                  )}
                 </motion.div>
               ))}
             </div>
+
+            {/* Zusatzfeld für Allgemein-Auswahl */}
+            {config.type === 'general' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-6"
+              >
+                <Select
+                  label="Welche Art von Teppich haben Sie?"
+                  options={[
+                    { value: '', label: 'Bitte auswählen...' },
+                    ...generalSubtypes,
+                  ]}
+                  value={config.generalSubtype || ''}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      generalSubtype: e.target.value as GeneralCarpetSubtype,
+                    })
+                  }
+                  required
+                />
+              </motion.div>
+            )}
           </div>
         );
 
@@ -143,26 +228,73 @@ export default function ConfiguratorPage() {
               Geben Sie die Maße Ihres Teppichs in cm an
             </p>
             <div className="space-y-4">
-              <Input
-                type="number"
-                label="Länge (cm)"
-                value={config.length || ''}
-                onChange={(e) =>
-                  setConfig({ ...config, length: Number(e.target.value) })
-                }
-                min="1"
-                required
-              />
-              <Input
-                type="number"
-                label="Breite (cm)"
-                value={config.width || ''}
-                onChange={(e) =>
-                  setConfig({ ...config, width: Number(e.target.value) })
-                }
-                min="1"
-                required
-              />
+              <div>
+                <Input
+                  type="number"
+                  label="Länge (cm)"
+                  value={config.length || ''}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    // Begrenze den Wert zwischen 1 und 400
+                    if (value <= 400 || e.target.value === '') {
+                      setConfig({ ...config, length: value });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    // Bei Verlassen des Feldes: Korrigiere ungültige Werte
+                    if (value < 1 || isNaN(value)) {
+                      setConfig({ ...config, length: 1 });
+                    } else if (value > 400) {
+                      setConfig({ ...config, length: 400 });
+                    }
+                  }}
+                  min="1"
+                  max="400"
+                  required
+                />
+                {(config.length ?? 0) > 400 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Maximale Länge: 400 cm
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="number"
+                  label="Breite (cm)"
+                  value={config.width || ''}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    // Begrenze den Wert zwischen 1 und 300
+                    if (value <= 300 || e.target.value === '') {
+                      setConfig({ ...config, width: value });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    // Bei Verlassen des Feldes: Korrigiere ungültige Werte
+                    if (value < 1 || isNaN(value)) {
+                      setConfig({ ...config, width: 1 });
+                    } else if (value > 300) {
+                      setConfig({ ...config, width: 300 });
+                    }
+                  }}
+                  min="1"
+                  max="300"
+                  required
+                />
+                {(config.width ?? 0) > 300 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Maximale Breite: 300 cm
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">Hinweis:</span> Maximale Größe: 300 × 400 cm
+              </p>
             </div>
           </div>
         );
@@ -178,13 +310,41 @@ export default function ConfiguratorPage() {
               type="number"
               label="Dicke (cm)"
               value={config.thickness || ''}
-              onChange={(e) =>
-                setConfig({ ...config, thickness: Number(e.target.value) })
-              }
-              min="0.1"
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                // Begrenze den Wert zwischen 0.2 und 5
+                if (value <= 5 || e.target.value === '') {
+                  setConfig({ ...config, thickness: value });
+                }
+              }}
+              onBlur={(e) => {
+                const value = Number(e.target.value);
+                // Bei Verlassen des Feldes: Korrigiere ungültige Werte
+                if (value < 0.2 || isNaN(value)) {
+                  setConfig({ ...config, thickness: 1 });
+                } else if (value > 5) {
+                  setConfig({ ...config, thickness: 5 });
+                }
+              }}
+              min="0.2"
+              max="5"
               step="0.1"
               required
             />
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">Hinweis:</span>
+                <span className="block mt-1">
+                  • 0,2 cm = sehr dünn (Kilim)
+                </span>
+                <span className="block">
+                  • 0,5–1,5 cm = Standard
+                </span>
+                <span className="block">
+                  • 2–5 cm = Hochflor/Shaggy
+                </span>
+              </p>
+            </div>
           </div>
         );
 
@@ -205,6 +365,63 @@ export default function ConfiguratorPage() {
               placeholder="z.B. Einige Flecken, allgemein guter Zustand..."
               required
             />
+
+            {/* Juristisches Hinweisfeld */}
+            <div className="mt-6 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-amber-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    Wir garantieren eine gründliche und fachgerechte Reinigung Ihres Teppichs.
+                    Bitte beachten Sie, dass eine vollständige Entfernung sämtlicher Flecken
+                    nicht in jedem Fall gewährleistet werden kann. Dies ist abhängig von Art,
+                    Alter und Beschaffenheit der Verschmutzung sowie des Materials.
+                  </p>
+                  <p className="mt-3 text-xs text-amber-700">
+                    Weitere Informationen finden Sie in unseren{' '}
+                    <a
+                      href="/agb"
+                      className="font-semibold underline hover:text-amber-900 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      AGB
+                    </a>
+                    , der{' '}
+                    <a
+                      href="/widerruf"
+                      className="font-semibold underline hover:text-amber-900 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Widerrufsbelehrung
+                    </a>
+                    {' '}sowie der{' '}
+                    <a
+                      href="/datenschutz"
+                      className="font-semibold underline hover:text-amber-900 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Datenschutzerklärung
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         );
 
@@ -242,6 +459,12 @@ export default function ConfiguratorPage() {
                 <p className="text-sm text-gray-600">Teppichart</p>
                 <p className="font-semibold">
                   {carpetTypes.find((t) => t.value === config.type)?.label}
+                  {config.type === 'general' && config.generalSubtype && (
+                    <span className="text-gray-600 font-normal">
+                      {' '}
+                      - {generalSubtypes.find((s) => s.value === config.generalSubtype)?.label}
+                    </span>
+                  )}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
@@ -283,6 +506,11 @@ export default function ConfiguratorPage() {
   // Zeige 3D-Modell ab Schritt 2 (wenn Typ ausgewählt wurde)
   const show3DModel = config.type && currentStep >= 2;
 
+  // Berechne aktuellen Preis
+  const currentPrice = config.type && config.length && config.width && config.thickness
+    ? calculatePrice(config as CarpetConfig)
+    : null;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -309,7 +537,7 @@ export default function ConfiguratorPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Step Content */}
-          <div>
+          <div className="space-y-6">
             <Card>
               <AnimatePresence mode="wait">
                 <motion.div
@@ -346,9 +574,84 @@ export default function ConfiguratorPage() {
                 )}
               </div>
             </Card>
+
+            {/* Preis-Kasten - Unter den Schritt-Inhalten */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-lg text-gray-900">
+                    Preis
+                  </h3>
+                  <svg
+                    className="w-6 h-6 text-primary-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {currentPrice !== null ? (
+                    <motion.div
+                      key="price-display"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6 text-center">
+                        <p className="text-sm text-gray-600 mb-1">Reinigungspreis</p>
+                        <p className="text-4xl font-bold text-primary-600">
+                          {formatPrice(currentPrice)}
+                        </p>
+                        {config.length && config.width && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Fläche: {((config.length * config.width) / 10000).toFixed(2)} m²
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="price-placeholder"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="bg-gray-50 rounded-xl p-6 text-center"
+                    >
+                      <p className="text-gray-500 text-sm">
+                        Geben Sie die Maße ein, um den Preis zu berechnen
+                      </p>
+                      <div className="mt-3 flex items-center justify-center space-x-1">
+                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse delay-75"></div>
+                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse delay-150"></div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Der Preis wird automatisch basierend auf Teppichart, Größe und Dicke berechnet.
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
           </div>
 
-          {/* 3D Viewer Sidebar */}
+          {/* 3D Viewer Sidebar - Nur für 3D Vorschau */}
           <div className="lg:sticky lg:top-24 h-fit">
             {show3DModel ? (
               <motion.div
@@ -359,27 +662,20 @@ export default function ConfiguratorPage() {
                 <Card className="p-0 overflow-hidden">
                   <div className="p-4 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl">
                     <h3 className="text-white font-bold text-lg">
-                      3D Vorschau
+                      Teppich-Vorschau
                     </h3>
                     <p className="text-primary-100 text-sm">
-                      Live-Ansicht Ihres Teppichs
+                      Größenvergleich mit einer Person (170 cm)
                     </p>
                   </div>
-                  <div className="relative h-[400px]">
-                    <Suspense fallback={
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <p className="text-gray-500">Lädt...</p>
-                      </div>
-                    }>
-                      <Carpet3DViewer
-                        length={config.length || 200}
-                        width={config.width || 150}
-                        thickness={config.thickness || 2}
-                        type={config.type || 'orient'}
-                      />
-                    </Suspense>
-                  </div>
                   <div className="p-4">
+                    <CarpetRoomPreview
+                      length={config.length || 200}
+                      width={config.width || 150}
+                      type={config.type || 'orient'}
+                    />
+                  </div>
+                  <div className="p-4 pt-0">
                     <CarpetDimensionsDisplay
                       length={config.length || 0}
                       width={config.width || 0}
@@ -407,10 +703,10 @@ export default function ConfiguratorPage() {
                   </svg>
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  3D-Vorschau
+                  Teppich-Vorschau
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Wählen Sie eine Teppichart aus, um die 3D-Vorschau zu sehen
+                  Wählen Sie eine Teppichart aus, um den Größenvergleich zu sehen
                 </p>
               </Card>
             )}

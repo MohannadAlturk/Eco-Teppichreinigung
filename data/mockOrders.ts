@@ -1,9 +1,12 @@
 import { Order } from '@/types/order';
 
 export const mockOrders: Order[] = [
+  // ── Bestehende Bestellungen (bereits bestätigt & in Bearbeitung) ──
   {
     id: 'ORD-001',
     userId: '1',
+    customerName: 'Thomas Müller',
+    customerEmail: 'thomas.mueller@example.de',
     carpet: {
       type: 'orient',
       length: 200,
@@ -13,7 +16,7 @@ export const mockOrders: Order[] = [
       images: [],
     },
     status: 'in_cleaning',
-    price: 89.99,
+    price: 129.99,
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-20'),
     shippingAddress: {
@@ -23,35 +26,18 @@ export const mockOrders: Order[] = [
       country: 'Deutschland',
     },
     timeline: [
-      {
-        status: 'created',
-        timestamp: new Date('2024-01-15'),
-        message: 'Bestellung wurde erstellt',
-      },
-      {
-        status: 'shipped_to_us',
-        timestamp: new Date('2024-01-16'),
-        message: 'Paket wurde an uns versendet',
-      },
-      {
-        status: 'received',
-        timestamp: new Date('2024-01-18'),
-        message: 'Teppich wurde von uns empfangen',
-      },
-      {
-        status: 'in_cleaning',
-        timestamp: new Date('2024-01-20'),
-        message: 'Reinigung ist im Gange',
-      },
+      { status: 'pending_admin', timestamp: new Date('2024-01-15'), message: 'Anfrage eingegangen' },
+      { status: 'created',       timestamp: new Date('2024-01-15'), message: 'Auftrag bestätigt' },
+      { status: 'shipped_to_us', timestamp: new Date('2024-01-16'), message: 'Paket versendet' },
+      { status: 'received',      timestamp: new Date('2024-01-18'), message: 'Teppich empfangen' },
+      { status: 'in_cleaning',   timestamp: new Date('2024-01-20'), message: 'Reinigung gestartet' },
     ],
-    images: {
-      before: [],
-      after: [],
-    },
   },
   {
     id: 'ORD-002',
     userId: '1',
+    customerName: 'Sarah Becker',
+    customerEmail: 'sarah.becker@example.de',
     carpet: {
       type: 'wool',
       length: 180,
@@ -61,50 +47,137 @@ export const mockOrders: Order[] = [
       images: [],
     },
     status: 'completed',
-    price: 69.99,
+    price: 89.99,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-10'),
     shippingAddress: {
-      street: 'Musterstraße 123',
-      city: 'Berlin',
-      zipCode: '10115',
+      street: 'Hauptstraße 45',
+      city: 'München',
+      zipCode: '80331',
       country: 'Deutschland',
     },
     timeline: [
-      {
-        status: 'created',
-        timestamp: new Date('2024-01-01'),
-        message: 'Bestellung wurde erstellt',
-      },
-      {
-        status: 'shipped_to_us',
-        timestamp: new Date('2024-01-02'),
-        message: 'Paket wurde an uns versendet',
-      },
-      {
-        status: 'received',
-        timestamp: new Date('2024-01-04'),
-        message: 'Teppich wurde von uns empfangen',
-      },
-      {
-        status: 'in_cleaning',
-        timestamp: new Date('2024-01-05'),
-        message: 'Reinigung ist im Gange',
-      },
-      {
-        status: 'completed',
-        timestamp: new Date('2024-01-08'),
-        message: 'Reinigung abgeschlossen',
-      },
-      {
-        status: 'shipped_back',
-        timestamp: new Date('2024-01-10'),
-        message: 'Teppich wurde zurückgesendet',
-      },
+      { status: 'pending_admin', timestamp: new Date('2024-01-01'), message: 'Anfrage eingegangen' },
+      { status: 'created',       timestamp: new Date('2024-01-01'), message: 'Auftrag bestätigt' },
+      { status: 'shipped_to_us', timestamp: new Date('2024-01-02'), message: 'Paket versendet' },
+      { status: 'received',      timestamp: new Date('2024-01-04'), message: 'Teppich empfangen' },
+      { status: 'in_cleaning',   timestamp: new Date('2024-01-05'), message: 'Reinigung gestartet' },
+      { status: 'completed',     timestamp: new Date('2024-01-08'), message: 'Reinigung abgeschlossen' },
+      { status: 'shipped_back',  timestamp: new Date('2024-01-10'), message: 'Teppich zurückgesendet' },
     ],
-    images: {
-      before: [],
-      after: [],
+  },
+
+  // ── Offene Anfragen – warten auf Admin-Bestätigung ──
+  {
+    id: 'ORD-003',
+    userId: '2',
+    customerName: 'Klaus Schneider',
+    customerEmail: 'k.schneider@beispiel.de',
+    carpet: {
+      type: 'synthetic',
+      length: 240,
+      width: 170,
+      thickness: 1,
+      condition: 'Stark verschmutzt, Haustierhaare',
+      images: [],
     },
+    status: 'pending_admin',
+    price: 59.99,
+    createdAt: new Date('2024-04-22T09:14:00'),
+    updatedAt: new Date('2024-04-22T09:14:00'),
+    shippingAddress: {
+      street: 'Gartenweg 8',
+      city: 'Hamburg',
+      zipCode: '20095',
+      country: 'Deutschland',
+    },
+    timeline: [
+      { status: 'pending_admin', timestamp: new Date('2024-04-22T09:14:00'), message: 'Anfrage eingegangen – wartet auf Bestätigung' },
+    ],
+  },
+  {
+    id: 'ORD-004',
+    userId: '3',
+    customerName: 'Anna Fischer',
+    customerEmail: 'anna.fischer@web.de',
+    carpet: {
+      type: 'orient',
+      length: 300,
+      width: 200,
+      thickness: 3,
+      condition: 'Altteppich, Weinflecken',
+      images: [],
+    },
+    status: 'pending_admin',
+    price: 179.99,
+    createdAt: new Date('2024-04-22T11:32:00'),
+    updatedAt: new Date('2024-04-22T11:32:00'),
+    shippingAddress: {
+      street: 'Birkenstraße 22',
+      city: 'Frankfurt am Main',
+      zipCode: '60311',
+      country: 'Deutschland',
+    },
+    timeline: [
+      { status: 'pending_admin', timestamp: new Date('2024-04-22T11:32:00'), message: 'Anfrage eingegangen – wartet auf Bestätigung' },
+    ],
+  },
+  {
+    id: 'ORD-005',
+    userId: '4',
+    customerName: 'Michael Braun',
+    customerEmail: 'michael.braun@email.de',
+    carpet: {
+      type: 'wool',
+      length: 160,
+      width: 90,
+      thickness: 2,
+      condition: 'Normale Gebrauchsspuren',
+      images: [],
+    },
+    status: 'pending_admin',
+    price: 74.99,
+    createdAt: new Date('2024-04-22T14:05:00'),
+    updatedAt: new Date('2024-04-22T14:05:00'),
+    shippingAddress: {
+      street: 'Rosenweg 3',
+      city: 'Köln',
+      zipCode: '50667',
+      country: 'Deutschland',
+    },
+    timeline: [
+      { status: 'pending_admin', timestamp: new Date('2024-04-22T14:05:00'), message: 'Anfrage eingegangen – wartet auf Bestätigung' },
+    ],
+  },
+
+  // ── Abgelehnte Anfrage (Beispiel) ──
+  {
+    id: 'ORD-006',
+    userId: '5',
+    customerName: 'Petra Vogel',
+    customerEmail: 'petra.vogel@gmail.com',
+    carpet: {
+      type: 'general',
+      length: 80,
+      width: 60,
+      thickness: 0.5,
+      condition: 'Sehr stark beschädigt, Schimmel',
+      images: [],
+    },
+    status: 'rejected',
+    price: 39.99,
+    adminNote: 'Teppich aufgrund von Schimmelbefall leider nicht reinigbar. Keine Kosten entstanden.',
+    createdAt: new Date('2024-04-20T16:20:00'),
+    updatedAt: new Date('2024-04-21T09:00:00'),
+    shippingAddress: {
+      street: 'Lindenallee 17',
+      city: 'Stuttgart',
+      zipCode: '70173',
+      country: 'Deutschland',
+    },
+    timeline: [
+      { status: 'pending_admin', timestamp: new Date('2024-04-20T16:20:00'), message: 'Anfrage eingegangen' },
+      { status: 'rejected',      timestamp: new Date('2024-04-21T09:00:00'), message: 'Auftrag abgelehnt – nicht reinigbar' },
+    ],
   },
 ];

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Leaf, Truck, Award, Package, Droplet, CheckCircle } from 'lucide-react';
+import { FAQ } from '@/components/FAQ';
 
 export default function HomePage() {
   const features = [
@@ -48,27 +49,45 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-50 to-primary-100 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 px-2">
-              Teppich<wbr />reinigung
-              <span className="text-primary-600"> neu gedacht</span>
-            </h1>
-            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Professionelle, umweltfreundliche Teppichreinigung mit kostenlosem
-              Versand. Einfach, schnell und nachhaltig.
-            </p>
-            <Link href="/configurator">
-              <Button size="lg">Teppich reinigen lassen</Button>
-            </Link>
-          </motion.div>
+      {/* Hero Section with Video Background */}
+      <section className="relative h-[600px] md:h-[700px] overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/video1.MP4" type="video/mp4" />
+        </video>
+
+        {/* Overlay für besseren Kontrast */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Content */}
+        <div className="relative h-full flex items-center justify-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 px-2 drop-shadow-2xl">
+                Teppich<wbr />reinigung
+                <span className="text-primary-400"> neu gedacht</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto drop-shadow-lg">
+                Ihr Experte, wenn es um die Sauberkeit Ihres Teppichs geht. Einfach und sauber.
+              </p>
+              <Link href="/configurator">
+                <Button size="lg" className="shadow-2xl">
+                  Teppich reinigen lassen
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -140,8 +159,63 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Einblick in unsere Arbeit - Video Gallery */}
       <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold mb-4">
+              Einblick in unsere Arbeit
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Sehen Sie selbst, wie wir Ihre Teppiche professionell und schonend reinigen
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { video: 'video1.MP4', title: 'Professionelle Reinigung', description: 'Unser Team bei der Arbeit' },
+              { video: 'video2.MP4', title: 'Detailarbeit', description: 'Sorgfältige Behandlung jedes Teppichs' },
+              { video: 'video3.MP4', title: 'Qualitätskontrolle', description: 'Perfekte Ergebnisse garantiert' },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="overflow-hidden h-full">
+                  <div className="relative aspect-video bg-gray-100">
+                    <video
+                      controls
+                      className="w-full h-full object-cover"
+                      preload="metadata"
+                    >
+                      <source src={`/videos/${item.video}`} type="video/mp4" />
+                    </video>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                    <p className="text-gray-600">{item.description}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <FAQ />
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Bereit für einen sauberen Teppich?

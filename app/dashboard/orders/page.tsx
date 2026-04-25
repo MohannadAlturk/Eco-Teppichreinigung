@@ -28,6 +28,13 @@ export default function OrdersPage() {
     shipped_back: 'bg-green-100 text-green-800',
   };
 
+  const carpetTypeLabels: Record<string, string> = {
+    orient: 'Orientteppich',
+    wool: 'Wollteppich',
+    general: 'Allgemein',
+    synthetic: 'Synthetik',
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -55,7 +62,7 @@ export default function OrdersPage() {
                 <div className="space-y-1 text-sm text-gray-600">
                   <p>Datum: {formatDate(order.createdAt)}</p>
                   <p>
-                    Teppich: {order.carpet.type} ({order.carpet.length}×
+                    Teppich: {carpetTypeLabels[order.carpet.type]} ({order.carpet.length}×
                     {order.carpet.width}cm)
                   </p>
                 </div>

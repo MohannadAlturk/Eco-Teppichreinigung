@@ -1,151 +1,153 @@
-# Eco Teppichreinigung - Frontend Prototyp
+# Eco Teppichreinigung – Frontend
 
-Ein vollständig funktionsfähiger Frontend-Prototyp für eine umweltfreundliche Teppichreinigungs-Plattform.
+Professionelle Frontend-Anwendung für eine Teppichreinigungs-Plattform mit vollständigem Bestell- und Admin-Workflow.
 
 ## Technologie-Stack
 
-- **Framework:** Next.js 15 (App Router)
-- **Sprache:** TypeScript
-- **Styling:** Tailwind CSS
-- **State Management:** Zustand
-- **Formulare:** React Hook Form + Zod
-- **Animationen:** Framer Motion
-- **Icons:** Lucide React
-- **3D-Rendering:** Three.js + React Three Fiber + Drei
+| Bereich | Technologie |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Sprache | TypeScript |
+| Styling | Tailwind CSS |
+| State Management | Zustand |
+| Animationen | Framer Motion |
+| Icons | Lucide React |
+| Schrift (Logo) | Dancing Script (Google Fonts, inline SVG) |
+
+> **Hinweis:** Three.js / React Three Fiber wurden entfernt. Die frühere 3D-Vorschau hat auf macOS wiederholt den WindowServer zum Absturz gebracht (GPU-Hang). Sie wurde durch eine leichtgewichtige SVG-Größenvergleichs-Ansicht ersetzt.
+
+---
 
 ## Features
 
-### Vollständige User Journey
+### Kunden-Journey
 
-1. **Landing Page** - Übersicht über Service und Vorteile
-2. **Konfigurator mit 3D-Visualisierung** - Multi-Step-Formular zur Teppichkonfiguration
-   - Teppichart auswählen
-   - **Live 3D-Modell** - Interaktives 3D-Modell des Teppichs
-   - Größe angeben (Live-Update im 3D-Modell)
-   - Dicke eingeben (Live-Update im 3D-Modell)
-   - Zustand beschreiben
-   - Fotos hochladen (UI-Simulation)
-   - Preisberechnung
-   - **Interaktive 3D-Vorschau:**
-     - Drehen mit Maus/Touch
-     - Zoomen mit Scroll/Pinch
-     - Echtzeit-Updates bei Dimensionsänderungen
-     - Unterschiedliche Farben je Teppichart
-     - Gitter für Größenreferenz
-3. **Warenkorb** - Übersicht der konfigurierten Teppiche
-4. **Checkout** - Adresseingabe, Versandart, Zahlungsmethode
-5. **Success-Page** - Bestellbestätigung
-6. **Dashboard** - Kundenbereich mit:
-   - Übersicht der Bestellungen
-   - Detailansicht mit Timeline
-   - Profilverwaltung
-   - Einstellungen
+1. **Startseite** – Hero-Video, Vorteile, Prozess-Übersicht, Video-Galerie, FAQ-Accordion, CTA
+2. **Konfigurator** – Multi-Step-Formular:
+   - Teppichart wählen (Orient, Wolle, Allgemein, Synthetik)
+   - Maße & Dicke eingeben
+   - SVG-Größenvergleich mit Personensilhouette (170 cm)
+   - Zustand beschreiben & Fotos hochladen (UI-Simulation)
+   - Live-Preisberechnung
+3. **Warenkorb** – Übersicht & Bearbeitung
+4. **Checkout** – Adresse, Versandart, 6 Zahlungsmethoden
+5. **Success-Page** – Bestätigung mit Hinweis: Zahlung erst nach Admin-Bestätigung
 
-### Authentifizierung (Mock)
+### Admin-Bereich (`/admin`)
 
-- Login
-- Registrierung
-- Passwort vergessen
+Nur für Mitarbeiter – nicht verlinkt, nicht indexiert.
+
+| Route | Funktion |
+|---|---|
+| `/admin` | Login (admin / admin) |
+| `/admin/dashboard` | Auftragsübersicht mit Stats & Filter |
+| `/admin/dashboard/orders/[id]` | Auftragsdetail mit Bestätigen/Ablehnen |
+
+**Auftragsablauf:**
+- Kunde sendet ab → Status `pending_admin`
+- Admin **bestätigt** → Status `created` → Reinigungsprozess startet, Zahlung fällig
+- Admin **lehnt ab** → Status `rejected` → keine Kosten für den Kunden
+
+---
 
 ## Installation
 
 ```bash
-# Dependencies installieren
 npm install
-
-# Development-Server starten
-npm run dev
-
-# Production-Build erstellen
-npm run build
-
-# Production-Server starten
-npm start
+npm run dev       # Development-Server (http://localhost:3000)
+npm run build     # Production-Build
+npm start         # Production-Server
 ```
+
+---
 
 ## Projektstruktur
 
 ```
-/app                    # Next.js App Router Pages
-  /login
-  /register
-  /forgot-password
-  /configurator        # Mit 3D-Visualisierung
-  /cart
-  /checkout
-  /success
-  /dashboard
-    /orders
-      /[id]
-    /profile
-    /settings
+/app
+  /admin
+    /dashboard
+      /orders/[id]   Admin: Auftragsdetail
+    /dashboard        Admin: Auftragsübersicht
+    /page.tsx         Admin: Login
+  /cart               Warenkorb
+  /checkout           Bestellabschluss
+  /configurator       Teppich-Konfigurator (Multi-Step)
+  /success            Bestellbestätigung
+  layout.tsx          Root-Layout (ConditionalLayout)
 
 /components
-  /ui                   # Wiederverwendbare UI-Komponenten
-  /layout              # Layout-Komponenten (Header, Footer)
-  /configurator        # 3D-Teppich-Viewer & Dimensions-Display
-  /dashboard           # Dashboard-spezifische Komponenten
+  /admin
+    AdminHeader.tsx   Gemeinsamer Admin-Header (Logo + Abmelden)
+  /configurator
+    CarpetRoomPreview.tsx   SVG-Größenvergleich (ersetzt 3D-Viewer)
+    CarpetDimensionsDisplay.tsx
+    Carpet3DViewer.tsx      @deprecated – GPU-Absturzrisiko
+    Carpet3DModel.tsx       @deprecated – GPU-Absturzrisiko
+  /layout
+    Header.tsx              Kunden-Header mit Inline-SVG-Logo
+    Footer.tsx
+    ConditionalLayout.tsx   Header/Footer nur auf Nicht-Admin-Routen
+  /ui
+    Button, Card, Input, Select, Textarea
+  FAQ.tsx                   Accordion-FAQ-Sektion
 
-/data                   # Mock-Daten
-  mockUsers.ts
-  mockOrders.ts
-  mockCarpets.ts
-
-/store                  # Zustand State Management
+/store
   cartStore.ts
-  orderStore.ts
-  userStore.ts
+  orderStore.ts      inkl. updateOrderStatus (Admin-Aktionen)
+  adminStore.ts      Login-State (Zustand + persist)
 
-/types                  # TypeScript Type Definitionen
-  user.ts
-  order.ts
+/types
   carpet.ts
+  order.ts           OrderStatus: pending_admin | rejected | created | …
+  user.ts
 
-/utils                  # Utility-Funktionen
+/data
+  mockOrders.ts      Demo-Daten: 3 offene, 2 bestätigte, 1 abgelehnte Anfrage
+
+/utils
   priceCalculator.ts
   format.ts
-
-/styles                 # Globale Styles
-  globals.css
 ```
 
-## Mock-Daten
+---
 
-Die Anwendung arbeitet vollständig mit Mock-Daten. Es ist **kein Backend** erforderlich.
+## Bestellstatus-Übersicht
 
-### Login
+```
+pending_admin  →  Neue Anfrage (wartet auf Admin)
+     ↓ bestätigen          ↓ ablehnen
+   created               rejected
+     ↓
+shipped_to_us → received → in_cleaning → completed → shipped_back
+```
 
-Sie können sich mit beliebigen Daten einloggen - die Authentifizierung ist simuliert.
+---
+
+## Zahlungsmethoden (Frontend)
+
+- Kreditkarte · PayPal · Klarna · Sofortüberweisung · Giropay · SEPA
+
+Backend-Integration folgt.
+
+---
+
+## Design
+
+- **Primärfarbe:** `#E8612D` (Orange – Logofarbe)
+- **Header / Footer:** `bg-gray-900` (dunkel, unverändert)
+- **Admin-Bereich:** Dark-Theme durchgehend (`bg-gray-950`)
+- **Logo:** Inline-SVG mit Dancing Script (Google Fonts), transparent, keine Bildabhängigkeit
+- Responsive: Mobile-first, Tabelle → Karten-Layout im Admin auf kleinen Bildschirmen
+
+---
 
 ## Wichtige Hinweise
 
-- **Kein Backend:** Alle Daten werden nur im Browser gespeichert (Zustand)
-- **Keine Persistenz:** Bei Seiten-Reload gehen die Daten verloren
-- **Prototyp:** Für Demo- und Präsentationszwecke optimiert
+- **Kein Backend:** Alle Daten leben im Browser-State (Zustand)
+- **Keine Persistenz:** Bei Seiten-Reload gehen Bestellungen verloren (außer Admin-Login via `localStorage`)
+- **Admin-Sicherheit:** Login ist rein frontend-seitig (demo). Vor Produktiveinsatz durch echte Backend-Authentifizierung ersetzen.
 
-## Design-Prinzipien
+---
 
-- Modern und minimalistisch
-- Konsistente Abstände und Rundungen (rounded-2xl)
-- Schatten für Tiefe
-- Animationen für bessere UX
-- Vollständig responsive
-- Klare Typografie
-
-## Farben
-
-- **Primary:** Grün-Töne (für umweltfreundliches Branding)
-- **Secondary:** Grau-Töne
-- **Accent:** Verwendet für Status und Highlights
-
-## Browser-Unterstützung
-
-- Chrome (neueste Version)
-- Firefox (neueste Version)
-- Safari (neueste Version)
-- Edge (neueste Version)
-
-
-## License
-
-Dieses Projekt ist ein Prototyp zu Demonstrationszwecken.
+© 2026 Eco Teppichreinigung. Alle Rechte vorbehalten.
