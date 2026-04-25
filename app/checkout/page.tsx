@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { useCartStore } from '@/store/cartStore';
 import { useOrderStore } from '@/store/orderStore';
 import { formatPrice } from '@/utils/format';
-import { CreditCard, Truck } from 'lucide-react';
+import { CreditCard, Truck, AlertTriangle } from 'lucide-react';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -68,13 +68,17 @@ export default function CheckoutPage() {
     router.push('/success');
   };
 
-  if (typeof window !== 'undefined' && items.length === 0) {
-    router.push('/cart');
-    return null;
-  }
+  useEffect(() => {
+    if (items.length === 0) router.push('/cart');
+  }, [items.length, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <motion.div
+      className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+    >
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Kasse</h1>
 
@@ -357,11 +361,14 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-sm text-amber-800">
-                    <p className="font-semibold mb-1">⚠ Keine sofortige Zahlung</p>
-                    <p>Ihre Anfrage wird zunächst von uns geprüft. <strong>Kosten entstehen erst nach unserer Bestätigung.</strong> Bei Ablehnung entstehen Ihnen keine Kosten.</p>
+                    <div className="flex items-center gap-2 font-semibold mb-1">
+                      <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                      Verbindliche Anfrage
+                    </div>
+                    <p>Mit dem Absenden erklären Sie sich verbindlich bereit, den Auftrag zu erteilen. <strong>Die Bestellung gilt erst als abgeschlossen, sobald wir Ihren Auftrag bestätigen</strong> – erst dann wird die Zahlung fällig. Lehnen wir ab, entstehen Ihnen keine Kosten.</p>
                   </div>
                   <Button type="submit" className="w-full" disabled={!termsAccepted}>
-                    Auftrag unverbindlich absenden
+                    Auftrag verbindlich absenden
                   </Button>
                 </div>
               </Card>
@@ -369,6 +376,6 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }

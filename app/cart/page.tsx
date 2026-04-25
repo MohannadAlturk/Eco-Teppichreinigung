@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +13,13 @@ import { Trash2, ShoppingBag } from 'lucide-react';
 export default function CartPage() {
   const router = useRouter();
   const { items, removeItem, getTotal } = useCartStore();
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    setCheckingOut(true);
+    await new Promise((r) => setTimeout(r, 600));
+    router.push('/checkout');
+  };
 
   const carpetTypeLabels: Record<string, string> = {
     orient: 'Orientteppich',
@@ -131,9 +139,17 @@ export default function CartPage() {
 
                 <Button
                   className="w-full"
-                  onClick={() => router.push('/checkout')}
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
                 >
-                  Zur Kasse
+                  {checkingOut ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                      Wird geladen…
+                    </span>
+                  ) : (
+                    'Zur Kasse'
+                  )}
                 </Button>
               </div>
 
