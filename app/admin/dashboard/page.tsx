@@ -85,7 +85,9 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* ── Filter Tabs ── */}
-        <div className="flex gap-0 mb-6 border-b border-gray-800 overflow-x-auto scrollbar-none">
+        <div className="flex gap-0 mb-6 border-b border-gray-800 overflow-x-auto overflow-y-hidden scrollbar-none"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           {tabs.map((tab) => (
             <button
               key={tab.key}
