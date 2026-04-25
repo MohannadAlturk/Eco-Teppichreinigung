@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Leaf, Truck, Award, Package, Droplet, CheckCircle } from 'lucide-react';
+import { FAQ } from '@/components/FAQ';
 
 export default function HomePage() {
   const features = [
@@ -209,6 +210,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQ />
 
       {/* CTA Section */}
       <section className="py-20 bg-gray-50">

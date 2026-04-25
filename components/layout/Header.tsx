@@ -36,12 +36,12 @@ export const Header = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-20">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center w-[280px] sm:w-auto">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1400 180"
               fill="none"
-              className="h-14 w-auto"
+              className="w-full h-auto sm:w-auto sm:h-14"
               aria-label="Eco Teppichreinigung"
             >
               <defs>
@@ -114,7 +114,7 @@ export const Header = () => {
                 </span>
               )}
             </Link>
-            <Link href="/configurator">
+            <Link href="/configurator" className="hidden sm:block">
               <Button size="md">Jetzt reinigen</Button>
             </Link>
           </div>

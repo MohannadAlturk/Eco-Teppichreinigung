@@ -41,8 +41,10 @@ export default function CheckoutPage() {
       addOrder({
         id: `ORD-${Date.now()}`,
         userId: '1',
+        customerName: `${shippingData.firstName} ${shippingData.lastName}`,
+        customerEmail: shippingData.email,
         carpet: item.config,
-        status: 'created',
+        status: 'pending_admin',
         price: item.price,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -54,9 +56,9 @@ export default function CheckoutPage() {
         },
         timeline: [
           {
-            status: 'created',
+            status: 'pending_admin',
             timestamp: new Date(),
-            message: 'Bestellung wurde erstellt',
+            message: 'Anfrage eingegangen – wartet auf Bestätigung',
           },
         ],
       });
@@ -354,8 +356,12 @@ export default function CheckoutPage() {
                     </span>
                   </div>
 
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-sm text-amber-800">
+                    <p className="font-semibold mb-1">⚠ Keine sofortige Zahlung</p>
+                    <p>Ihre Anfrage wird zunächst von uns geprüft. <strong>Kosten entstehen erst nach unserer Bestätigung.</strong> Bei Ablehnung entstehen Ihnen keine Kosten.</p>
+                  </div>
                   <Button type="submit" className="w-full" disabled={!termsAccepted}>
-                    Jetzt bezahlen
+                    Auftrag unverbindlich absenden
                   </Button>
                 </div>
               </Card>

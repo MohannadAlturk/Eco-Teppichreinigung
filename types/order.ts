@@ -2,6 +2,8 @@ import { CarpetConfig } from './carpet';
 import { Address } from './user';
 
 export type OrderStatus =
+  | 'pending_admin'
+  | 'rejected'
   | 'created'
   | 'shipped_to_us'
   | 'received'
@@ -12,6 +14,8 @@ export type OrderStatus =
 export interface Order {
   id: string;
   userId: string;
+  customerName?: string;
+  customerEmail?: string;
   carpet: CarpetConfig;
   status: OrderStatus;
   price: number;
@@ -19,6 +23,7 @@ export interface Order {
   updatedAt: Date;
   shippingAddress: Address;
   timeline: OrderTimeline[];
+  adminNote?: string;
   images?: {
     before?: string[];
     after?: string[];
