@@ -253,7 +253,7 @@ export default function ConfiguratorPage() {
                   max="400"
                   required
                 />
-                {config.length > 400 && (
+                {(config.length ?? 0) > 400 && (
                   <p className="text-xs text-red-600 mt-1">
                     Maximale Länge: 400 cm
                   </p>
@@ -284,7 +284,7 @@ export default function ConfiguratorPage() {
                   max="300"
                   required
                 />
-                {config.width > 300 && (
+                {(config.width ?? 0) > 300 && (
                   <p className="text-xs text-red-600 mt-1">
                     Maximale Breite: 300 cm
                   </p>
